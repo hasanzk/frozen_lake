@@ -2,6 +2,7 @@
 
 import numpy as np
 import contextlib
+from Environment import Environment
 
 # Configures numpy print options
 
@@ -16,56 +17,6 @@ def _printoptions(*args, **kwargs):
         np.set_printoptions(**original)
 
 
-class EnvironmentModel:
-    def __init__(self, n_states, n_actions, seed=None):
-        self.n_states = n_states
-        self.n_actions = n_actions
-
-        self.random_state = np.random.RandomState(seed)
-
-    def p(self, next_state, state, action):
-        raise NotImplementedError()
-
-    def r(self, next_state, state, action):
-        raise NotImplementedError()
-
-    def draw(self, state, action):
-        p = [self.p(ns, state, action) for ns in range(self.n_states)]
-        next_state = self.random_state.choice(self.n_states, p=p)
-        reward = self.r(next_state, state, action)
-
-        return next_state, reward
-
-
-class Environment(EnvironmentModel):
-    def __init__(self, n_states, n_actions, max_steps, pi, seed=None):
-        EnvironmentModel.__init__(self, n_states, n_actions, seed)
-
-        self.max_steps = max_steps
-
-        self.pi = pi
-        if self.pi is None:
-            self.pi = np.full(n_states, 1./n_states)
-
-    def reset(self):
-        self.n_steps = 0
-        self.state = self.random_state.choice(self.n_states, p=self.pi)
-
-        return self.state
-
-    def step(self, action):
-        if action < 0 or action >= self.n_actions:
-            raise Exception('Invalid action.')
-
-        self.n_steps += 1
-        done = (self.n_steps >= self.max_steps)
-
-        self.state, reward = self.draw(self.state, action)
-
-        return self.state, reward, done
-
-    def render(self, policy=None, value=None):
-        raise NotImplementedError()
 
 
 class FrozenLake(Environment):
@@ -103,13 +54,15 @@ class FrozenLake(Environment):
 
         return state, reward, done
 
+    # returns the probability of transitioning from state to next state given action
     def p(self, next_state, state, action):
         # TODO:
-        print("p")# dummy code add by Abdullah
+        raise NotImplementedError() # dummy code add by Abdullah
 
+    # returns the expected reward in having transitioned from state to next state given action
     def r(self, next_state, state, action):
         # TODO:
-        print("r")# dummy code add by Abdullah
+        raise NotImplementedError()# dummy code add by Abdullah
 
     def render(self, policy=None, value=None):
         if policy is None:
@@ -176,7 +129,7 @@ def policy_iteration(env, gamma, theta, max_iterations, policy=None):
         policy = np.array(policy, dtype=int)
     
     # TODO:
-    vale = 0 # dummy code add by Abdullah
+    raise NotImplementedError() # dummy code add by Abdullah
     return policy, value
     
 def value_iteration(env, gamma, theta, max_iterations, value=None):
@@ -186,7 +139,7 @@ def value_iteration(env, gamma, theta, max_iterations, value=None):
         value = np.array(value, dtype=np.float)
     
     # TODO:
-    policy = 0 # dummy code add by Abdullah
+    raise NotImplementedError() # dummy code add by Abdullah
     return policy, value
 
 ################ Tabular model-free algorithms ################
