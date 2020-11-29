@@ -4,6 +4,7 @@ import numpy as np
 
 class EnvironmentModel:
     def __init__(self, n_states, n_actions, seed=None):
+        print("EnvironmentModel initialized...")
         self.n_states = n_states
         self.n_actions = n_actions
 

@@ -5,6 +5,7 @@ from EnvironmentModel import EnvironmentModel
 
 class Environment(EnvironmentModel):
     def __init__(self, n_states, n_actions, max_steps, pi, seed=None):
+        print("Environment initialized...")
         EnvironmentModel.__init__(self, n_states, n_actions, seed)
 
         self.max_steps = max_steps
