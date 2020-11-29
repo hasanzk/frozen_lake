@@ -1,6 +1,19 @@
 
 import numpy as np
+import contextlib
 from Environment import Environment
+
+# Configures numpy print options
+@contextlib.contextmanager
+def _printoptions(*args, **kwargs):
+    original = np.get_printoptions()
+    np.set_printoptions(*args, **kwargs)
+    try:
+        yield
+    finally:
+        np.set_printoptions(**original)
+
+
 
 class FrozenLake(Environment):
     def __init__(self, lake, slip, max_steps, seed=None):
