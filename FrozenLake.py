@@ -65,7 +65,6 @@ class FrozenLake(Environment):
                 next_state_index = self.stoi.get(next_state, state_index)
                 
                 self._p[next_state_index, state_index, action_index] = 1
-                print("state_index: {0},state: {1},action_index: {2},next_state_index: {3}".format(state_index,state,action_index,next_state_index))
                     
 
     def step(self, action):
