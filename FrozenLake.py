@@ -2,6 +2,8 @@
 import numpy as np
 import contextlib
 from Environment import Environment
+from itertools import product
+
 
 # Configures numpy print options
 @contextlib.contextmanager
@@ -42,7 +44,28 @@ class FrozenLake(Environment):
         self.absorbing_state = n_states - 1
 
         # TODO:
-        Environment.__init__(self,100,4,max_steps,None)
+        Environment.__init__(self,self.lake.size,4,max_steps,None)
+
+        # Up, down, left, right, stay
+        self.actions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+        # Indices to states (coordinates), states (coordinates) to indices 
+        self.itos = list(product(range(self.lake.shape[0]), range(self.lake.shape[1])))
+        self.stoi = {s: i for (i, s) in enumerate(self.itos)}
+        
+        # Precomputed transition probabilities
+        self._p = np.zeros((self.n_states, self.n_states, self.n_actions))
+        
+        for state_index, state in enumerate(self.itos):
+            for action_index, action in enumerate(self.actions):
+                next_state = (state[0] + action[0], state[1] + action[1])
+
+                
+                # If next_state is not valid, default to current state index
+                next_state_index = self.stoi.get(next_state, state_index)
+                
+                self._p[next_state_index, state_index, action_index] = 1.0
+                    
 
     def step(self, action):
         state, reward, done = Environment.step(self, action)
@@ -54,7 +77,7 @@ class FrozenLake(Environment):
     # returns the probability of transitioning from state to next state given action
     def p(self, next_state, state, action):
         # TODO:
-        return 1
+        return self._p[next_state, state, action] 
 
     # returns the expected reward in having transitioned from state to next state given action
     def r(self, next_state, state, action):

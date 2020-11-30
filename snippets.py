@@ -7,7 +7,8 @@ from FrozenLake import FrozenLake
 
 
 def play(env):
-    actions = ['w', 'a', 's', 'd']
+    # Up, down, left, right, stay
+    actions = ['w', 's', 'a', 'd']
 
     state = env.reset()
     env.render()
