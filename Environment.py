@@ -16,7 +16,7 @@ class Environment(EnvironmentModel):
 
     def reset(self):
         self.n_steps = 0
-        self.state = self.random_state.choice(self.n_states, p=self.pi)
+        self.state = 0 
 
         return self.state
 
