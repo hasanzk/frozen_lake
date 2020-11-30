@@ -64,7 +64,8 @@ class FrozenLake(Environment):
                 # If next_state is not valid, default to current state index
                 next_state_index = self.stoi.get(next_state, state_index)
                 
-                self._p[next_state_index, state_index, action_index] = 1.0
+                self._p[next_state_index, state_index, action_index] = 1
+                print("state_index: {0},state: {1},action_index: {2},next_state_index: {3}".format(state_index,state,action_index,next_state_index))
                     
 
     def step(self, action):
@@ -82,7 +83,10 @@ class FrozenLake(Environment):
     # returns the expected reward in having transitioned from state to next state given action
     def r(self, next_state, state, action):
         # TODO:
-        return 1
+        if self.lake[self.itos[next_state]] == '$':
+            return 1
+        else:
+            return 0
 
     def render(self, policy=None, value=None):
         if policy is None:

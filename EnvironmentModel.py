@@ -21,6 +21,14 @@ class EnvironmentModel:
     # receives a pair of state and action and returns a state drawn according to p together with the corresponding expected reward
     def draw(self, state, action):
         p = [self.p(ns, state, action) for ns in range(self.n_states)]
+        
+        # However, with probability 0.1, the environment ignores the desired direction and the agent slips (moves one tile in a random direction)
+        uncertanity = 0.1/15
+        for idx,c in enumerate(p):
+            if c == 1:
+                p[idx] = c - 0.1
+            else:
+                p[idx] = uncertanity
         next_state = self.random_state.choice(self.n_states, p=p)
         reward = self.r(next_state, state, action)
 
