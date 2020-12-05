@@ -82,7 +82,7 @@ class FrozenLake(Environment):
     # returns the expected reward in having transitioned from state to next state given action
     def r(self, next_state, state, action):
         # TODO:
-        if self.lake[self.itos[next_state]] == '$':
+        if self.lake[self.itos[state]] == '$':
             return 1
         else:
             return 0
