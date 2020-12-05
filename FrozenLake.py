@@ -70,7 +70,7 @@ class FrozenLake(Environment):
     def step(self, action):
         state, reward, done = Environment.step(self, action)
 
-        done = (state == self.absorbing_state) or done
+        done = (state == self.absorbing_state) or done or (self.lake[self.itos[state]] == '$') or (self.lake[self.itos[state]] == '#')
 
         return state, reward, done
 
