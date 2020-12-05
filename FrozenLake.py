@@ -44,10 +44,11 @@ class FrozenLake(Environment):
         self.absorbing_state = n_states - 1
 
         # TODO:
-        Environment.__init__(self,self.lake.size,4,max_steps,None)
-
-        # Up, down, left, right, stay
-        self.actions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        # Up, down, left, right
+        self.actions = [(-1, 0), (1, 0), (0, -1), (0, 1),(0,0)]
+        n_actions = len(self.actions)
+        
+        Environment.__init__(self,self.lake.size,n_actions,max_steps,None)
 
         # Indices to states (coordinates), states (coordinates) to indices 
         self.itos = list(product(range(self.lake.shape[0]), range(self.lake.shape[1])))
@@ -58,15 +59,18 @@ class FrozenLake(Environment):
         
         for state_index, state in enumerate(self.itos):
             for action_index, action in enumerate(self.actions):
-                next_state = (state[0] + action[0], state[1] + action[1])
 
-                
-                # If next_state is not valid, default to current state index
-                next_state_index = self.stoi.get(next_state, state_index)
-                
-                self._p[next_state_index, state_index, action_index] = 1
+                # However, with probability 0.1, the environment ignores the desired direction and the agent slips (moves one tile in a random direction)
+                for a_idx, a in enumerate(self.actions):
+                    next_state = (state[0] + action[0], state[1] + action[1])
+                    # If next_state is not valid, default to current state index
+                    next_state_index = self.stoi.get(next_state, state_index)
+                    if a == action:
+                        self._p[next_state_index, state_index, a_idx] += 0.9
+                    else:
+                        self._p[next_state_index, state_index, a_idx] += 0.025
                     
-
+  
     def step(self, action):
         state, reward, done = Environment.step(self, action)
 
@@ -98,7 +102,7 @@ class FrozenLake(Environment):
         else:
             # UTF-8 arrows look nicer, but cannot be used in LaTeX
             # https://www.w3schools.com/charsets/ref_utf_arrows.asp
-            actions = ['^', '<', '_', '>']
+            actions = ['^', 'ـ', '<', '>', ' ']
 
             print('Lake:')
             print(self.lake)
