@@ -104,9 +104,9 @@ class FrozenLake(Environment):
             print(self.lake)
 
             print('Policy:')
-            policy = np.array([actions[a] for a in policy[:-1]])
+            policy = np.array([actions[a] for a in policy])
             print(policy.reshape(self.lake.shape))
 
             print('Value:')
             with _printoptions(precision=3, suppress=True):
-                print(value[:-1].reshape(self.lake.shape))
+                print(value.reshape(self.lake.shape))

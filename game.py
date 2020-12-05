@@ -31,9 +31,19 @@ def play(env):
 def policy_evaluation(env, policy, gamma, theta, max_iterations):
     value = np.zeros(env.n_states, dtype=np.float)
 
-    # TODO:
+    for _ in range(max_iterations):
+        delta = 0
+        for s in range(env.n_states):
+            v = value[s]
+            value[s] = sum([env.p(next_s, s, policy[s]) * (env.r(next_s, s, policy[s]) + gamma * value[next_s]) for next_s in range(env.n_states)])
+
+            delta = max(delta, abs(v - value[s]))
+
+        if delta < theta:
+            break
 
     return value
+
     
 def policy_improvement(env, value, gamma):
     policy = np.zeros(env.n_states, dtype=int)
@@ -49,7 +59,7 @@ def policy_iteration(env, gamma, theta, max_iterations, policy=None):
         policy = np.array(policy, dtype=int)
     
     # TODO:
-    raise NotImplementedError() # dummy code add by Abdullah
+    value = policy_evaluation(env,policy,gamma,theta,max_iterations)
     return policy, value
     
 def value_iteration(env, gamma, theta, max_iterations, value=None):
@@ -58,8 +68,22 @@ def value_iteration(env, gamma, theta, max_iterations, value=None):
     else:
         value = np.array(value, dtype=np.float)
     
-    # TODO:
-    raise NotImplementedError() # dummy code add by Abdullah
+    for _ in range(max_iterations):
+        delta = 0.
+        
+        for s in range(env.n_states):
+            v = value[s]
+            value[s] = max([sum([env.p(next_s, s, a) * (env.r(next_s, s, a) + gamma * value[next_s]) for next_s in range(env.n_states)]) for a in range(env.n_actions)])
+    
+            delta = max(delta, np.abs(v - value[s]))
+
+        if delta < theta:
+            break
+
+    policy = np.zeros(env.n_states, dtype=int)
+    for s in range(env.n_states):
+        policy[s] = np.argmax([sum([env.p(next_s, s, a) * (env.r(next_s, s, a) + gamma * value[next_s]) for next_s in range(env.n_states)]) for a in range(env.n_actions)])
+
     return policy, value
 
 ################ Tabular model-free algorithms ################
@@ -192,17 +216,18 @@ def main():
     
 
 
-    print('## Play')
-    play(env)
-    return
-    print('')
+    # print('## Play')
+    # play(env)
+    # return
+    # print('')
     
     print('## Policy iteration')
     policy, value = policy_iteration(env, gamma, theta, max_iterations)
     env.render(policy, value)
     
     print('')
-    
+    return
+
     print('## Value iteration')
     policy, value = value_iteration(env, gamma, theta, max_iterations)
     env.render(policy, value)
