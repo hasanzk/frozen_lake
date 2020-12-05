@@ -216,10 +216,10 @@ def main():
     
 
 
-    # print('## Play')
-    # play(env)
-    # return
-    # print('')
+    print('## Play')
+    play(env)
+    return
+    print('')
     
     print('## Policy iteration')
     policy, value = policy_iteration(env, gamma, theta, max_iterations)
