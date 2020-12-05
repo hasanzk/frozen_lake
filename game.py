@@ -22,8 +22,8 @@ def play(env):
             raise Exception('Invalid action')
 
         state, r, done = env.step(actions.index(c))
-
-        env.render()
+        if not done:
+            env.render()
         print('Reward: {0}.'.format(r))
 
 ################ Model-based algorithms ################
