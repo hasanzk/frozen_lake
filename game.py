@@ -47,8 +47,13 @@ def policy_evaluation(env, policy, gamma, theta, max_iterations):
     
 def policy_improvement(env, value, gamma):
     policy = np.zeros(env.n_states, dtype=int)
-    
     # TODO:
+
+    for s in range(env.n_states):
+        actions = [0,1,2,3]
+
+        b = policy[s]
+        policy[s] = actions[np.argmax([sum([env.p(next_s, s, a) * (env.r(next_s, s, a) + gamma * value[next_s]) for next_s in range(env.n_states)]) for a in actions])]
 
     return policy
     
@@ -58,9 +63,14 @@ def policy_iteration(env, gamma, theta, max_iterations, policy=None):
     else:
         policy = np.array(policy, dtype=int)
     
+
     # TODO:
-    value = policy_evaluation(env,policy,gamma,theta,max_iterations)
-    return policy, value
+
+    for i in range(max_iterations):
+        values = policy_evaluation(env, policy, gamma, theta,max_iterations)
+        policy = policy_improvement(env, values, gamma)
+
+    return policy, values
     
 def value_iteration(env, gamma, theta, max_iterations, value=None):
     if value is None:
@@ -216,10 +226,10 @@ def main():
     
 
 
-    print('## Play')
-    play(env)
-    return
-    print('')
+    # print('## Play')
+    # play(env)
+    # return
+    # print('')
     
     print('## Policy iteration')
     policy, value = policy_iteration(env, gamma, theta, max_iterations)
