@@ -50,10 +50,13 @@ class FrozenLake(Environment):
         
         Environment.__init__(self,self.lake.size,n_actions,max_steps,None)
 
+
         # Indices to states (coordinates), states (coordinates) to indices 
         self.itos = list(product(range(self.lake.shape[0]), range(self.lake.shape[1])))
         self.stoi = {s: i for (i, s) in enumerate(self.itos)}
         
+        self.init_possible_actions()
+
         # Precomputed transition probabilities
         self._p = np.zeros((self.n_states, self.n_states, self.n_actions))
         
@@ -71,6 +74,33 @@ class FrozenLake(Environment):
                         self._p[next_state_index, state_index, a_idx] += 0.025
                     
   
+    def init_possible_actions(self):
+        self._possible_actions = []
+        for s in range(self.lake_flat.size):
+            s_actions = []
+            i, j = self.itos[s]
+
+            if self.valid_coord(i + 1, j):
+                s_actions.append(1)
+            if self.valid_coord(i - 1, j):
+                s_actions.append(0)
+            if self.valid_coord(i, j + 1):
+                s_actions.append(3)
+            if self.valid_coord(i, j - 1):
+                s_actions.append(2)
+            if self.valid_coord(i, j ):
+                s_actions.append(4)
+
+            self._possible_actions.append(s_actions)
+
+    def valid_coord(self, i, j):
+        return i >= 0 and i < self.lake.size \
+            and j >= 0 and j < self.lake[0].size
+    
+
+    def reached_goal(self,s):
+        return self.lake[self.itos[s]] == '$'
+
     def step(self, action):
         gameover = (self.lake[self.itos[self.state]] == '$') or (self.lake[self.itos[self.state]] == '#')
         state, reward, done = Environment.step(self, action)
@@ -87,7 +117,7 @@ class FrozenLake(Environment):
     # returns the expected reward in having transitioned from state to next state given action
     def r(self, next_state, state, action):
         # TODO:
-        if self.lake[self.itos[state]] == '$':
+        if not self.reached_goal(state) and self.reached_goal(next_state):
             return 1
         else:
             return 0

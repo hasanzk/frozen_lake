@@ -2,7 +2,7 @@
 
 import numpy as np
 from FrozenLake import FrozenLake
-
+from Environment import EGreedySelection
 
 
 
@@ -99,16 +99,37 @@ def value_iteration(env, gamma, theta, max_iterations, value=None):
 ################ Tabular model-free algorithms ################
 
 def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
-    random_state = np.random.RandomState(seed)
+    random_state = EGreedySelection(epsilon)
+    
     
     eta = np.linspace(eta, 0, max_episodes)
     epsilon = np.linspace(epsilon, 0, max_episodes)
     
     q = np.zeros((env.n_states, env.n_actions))
+    q.fill(float('-inf'))
     
+    for s in range(env.n_states):
+        actions = env._possible_actions[s]
+        for a in actions:
+            q[s, a] = 0
+
     for i in range(max_episodes):
         s = env.reset()
         # TODO:
+        a = random_state(q[s], env._possible_actions[s])
+
+        while not env.reached_goal(s):
+            state = env.itos[s]
+            next_s = (state[0] + env.actions[a][0] ,state[1] + env.actions[a][1])
+            next_s = env.stoi.get(next_s,s)
+            r = env.r(next_s,s, a)
+            next_a = random_state(q[next_s], env._possible_actions[next_s])
+
+            q[s, a] = q[s, a] + eta[i] * (r + gamma * q[next_s, next_a] - q[s, a])
+
+            s = next_s
+            a = next_a
+
     
     policy = q.argmax(axis=1)
     value = q.max(axis=1)
@@ -231,18 +252,17 @@ def main():
     # return
     # print('')
     
-    print('## Policy iteration')
-    policy, value = policy_iteration(env, gamma, theta, max_iterations)
-    env.render(policy, value)
+    # print('## Policy iteration')
+    # policy, value = policy_iteration(env, gamma, theta, max_iterations)
+    # env.render(policy, value)
     
-    print('')
+    # print('')
 
-    print('## Value iteration')
-    policy, value = value_iteration(env, gamma, theta, max_iterations)
-    env.render(policy, value)
+    # print('## Value iteration')
+    # policy, value = value_iteration(env, gamma, theta, max_iterations)
+    # env.render(policy, value)
     
-    print('')
-    return
+    # print('')
     
     print('# Model-free algorithms')
     max_episodes = 2000
@@ -256,6 +276,7 @@ def main():
     env.render(policy, value)
     
     print('')
+    return
     
     print('## Q-learning')
     policy, value = q_learning(env, max_episodes, eta, gamma, epsilon, seed=seed)
