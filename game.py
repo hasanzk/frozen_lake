@@ -236,13 +236,13 @@ def main():
     env.render(policy, value)
     
     print('')
-    return
 
     print('## Value iteration')
     policy, value = value_iteration(env, gamma, theta, max_iterations)
     env.render(policy, value)
     
     print('')
+    return
     
     print('# Model-free algorithms')
     max_episodes = 2000
