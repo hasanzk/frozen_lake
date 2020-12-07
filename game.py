@@ -137,17 +137,35 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
     return policy, value
     
 def q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
-    random_state = np.random.RandomState(seed)
+    random_state = EGreedySelection(epsilon)
     
     eta = np.linspace(eta, 0, max_episodes)
     epsilon = np.linspace(epsilon, 0, max_episodes)
     
     q = np.zeros((env.n_states, env.n_actions))
+    q.fill(float('-inf'))
     
+    for s in range(env.n_states):
+        actions = env._possible_actions[s]
+        for a in actions:
+            q[s, a] = 0
+
     for i in range(max_episodes):
         s = env.reset()
         # TODO:
-        
+
+        while not env.reached_goal(s):
+            a = random_state(q[s], env._possible_actions[s])
+            state = env.itos[s]
+            next_s = (state[0] + env.actions[a][0] ,state[1] + env.actions[a][1])
+            next_s = env.stoi.get(next_s,s)
+            r = env.r(next_s,s, a)
+
+            q[s, a] = q[s, a] + eta[i] * (r + gamma * max(q[next_s]) - q[s, a])
+
+            s = next_s
+
+
     policy = q.argmax(axis=1)
     value = q.max(axis=1)
         
@@ -276,13 +294,13 @@ def main():
     env.render(policy, value)
     
     print('')
-    return
     
     print('## Q-learning')
     policy, value = q_learning(env, max_episodes, eta, gamma, epsilon, seed=seed)
     env.render(policy, value)
     
     print('')
+    return
     
     linear_env = LinearWrapper(env)
     
