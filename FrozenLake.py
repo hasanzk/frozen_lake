@@ -44,7 +44,7 @@ class FrozenLake(Environment):
         self.absorbing_state = n_states - 1
 
         # TODO:
-        # Up, down, left, right
+        # Up 0, down 1, left 2, right 3, stay 4
         self.actions = [(-1, 0), (1, 0), (0, -1), (0, 1),(0,0)]
         n_actions = len(self.actions)
         
@@ -76,7 +76,7 @@ class FrozenLake(Environment):
   
     def init_possible_actions(self):
         self._possible_actions = []
-        for s in range(self.lake_flat.size):
+        for s in range(self.n_states):
             s_actions = []
             i, j = self.itos[s]
 
@@ -88,14 +88,12 @@ class FrozenLake(Environment):
                 s_actions.append(3)
             if self.valid_coord(i, j - 1):
                 s_actions.append(2)
-            if self.valid_coord(i, j ):
-                s_actions.append(4)
 
             self._possible_actions.append(s_actions)
 
     def valid_coord(self, i, j):
-        return i >= 0 and i < self.lake.size \
-            and j >= 0 and j < self.lake[0].size
+        valid = i >= 0 and i < self.lake[0].size and j >= 0 and j < self.lake[0].size
+        return valid
     
 
     def reached_goal(self,s):
@@ -119,6 +117,8 @@ class FrozenLake(Environment):
         # TODO:
         if not self.reached_goal(state) and self.reached_goal(next_state):
             return 1
+        elif self.lake[self.itos[state]] == '#':
+            return -1
         else:
             return 0
 
@@ -140,7 +140,18 @@ class FrozenLake(Environment):
 
             print('Policy:')
             policy = np.array([actions[a] for a in policy])
-            print(policy.reshape(self.lake.shape))
+            policy = policy.reshape(self.lake.shape)
+            for i in range(len(self.lake[0])):
+                for j in range(len(self.lake[0])):
+                    if self.lake[i][j] == '$':
+                        print("$",end=" ")
+                    elif self.lake[i][j] == '#':
+                        print("#",end=" ")
+                    elif self.lake[i, j] == '&':
+                        print("&",end=" ")
+                    else:
+                        print(policy[i][j],end=" ")
+                print('')
 
             print('Value:')
             with _printoptions(precision=3, suppress=True):
