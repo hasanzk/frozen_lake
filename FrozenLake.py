@@ -35,7 +35,7 @@ class FrozenLake(Environment):
 
         self.slip = slip
 
-        n_states = self.lake.size + 1
+        n_states = self.lake.size 
         n_actions = 4
 
         pi = np.zeros(n_states, dtype=float)
@@ -69,7 +69,7 @@ class FrozenLake(Environment):
                     if a == action:
                         self._p[next_state_index, state_index, a_idx] += 0.9
                     else:
-                        self._p[next_state_index, state_index, a_idx] += 0.025
+                        self._p[next_state_index, state_index, a_idx] += self.slip / (self.n_actions - 1)
                     
   
     def init_possible_actions(self):
@@ -115,8 +115,6 @@ class FrozenLake(Environment):
         # TODO:
         if not self.reached_goal(state) and self.reached_goal(next_state):
             return 1
-        elif self.lake[self.itos[state]] == '#':
-            return -1
         else:
             return 0
 
@@ -131,7 +129,7 @@ class FrozenLake(Environment):
         else:
             # UTF-8 arrows look nicer, but cannot be used in LaTeX
             # https://www.w3schools.com/charsets/ref_utf_arrows.asp
-            actions = ['^', 'ـ', '<', '>', ' ']
+            actions = ['^', 'ـ', '<', '>']
 
             print('Lake:')
             print(self.lake)

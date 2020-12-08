@@ -8,7 +8,7 @@ from Environment import EGreedySelection
 
 def play(env):
     # Up, down, left, right, stay
-    actions = ['w', 's', 'a', 'd', ' ']
+    actions = ['w', 's', 'a', 'd']
 
     state = env.reset()
     env.render()
@@ -214,13 +214,18 @@ class LinearWrapper:
         self.env.render(policy, value)
         
 def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
-    random_state = np.random.RandomState(seed)
+    random_state = EGreedySelection(epsilon)
     
     eta = np.linspace(eta, 0, max_episodes)
     epsilon = np.linspace(epsilon, 0, max_episodes)
     
     theta = np.zeros(env.n_features)
-    
+    for s in range(env.n_states):
+        actions = env._possible_actions[s]
+        for a in actions:
+            q[s, a] = 0
+
+
     for i in range(max_episodes):
         features = env.reset()
         
@@ -265,22 +270,22 @@ def main():
     
 
 
-    print('## Play')
-    play(env)
-    return
+    # print('## Play')
+    # play(env)
+    # return
     print('')
     
-    # print('## Policy iteration')
-    # policy, value = policy_iteration(env, gamma, theta, max_iterations)
-    # env.render(policy, value)
+    print('## Policy iteration')
+    policy, value = policy_iteration(env, gamma, theta, max_iterations)
+    env.render(policy, value)
     
-    # print('')
+    print('')
 
-    # print('## Value iteration')
-    # policy, value = value_iteration(env, gamma, theta, max_iterations)
-    # env.render(policy, value)
+    print('## Value iteration')
+    policy, value = value_iteration(env, gamma, theta, max_iterations)
+    env.render(policy, value)
     
-    # print('')
+    print('')
     
     print('# Model-free algorithms')
     max_episodes = 2000
@@ -301,7 +306,6 @@ def main():
     
     print('')
     return
-    
     linear_env = LinearWrapper(env)
     
     print('## Linear Sarsa')
