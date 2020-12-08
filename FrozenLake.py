@@ -74,7 +74,7 @@ class FrozenLake(Environment):
   
     def init_possible_actions(self):
         self._possible_actions = []
-        for s in range(self.n_states):
+        for s in range(self.n_states - 1):
             s_actions = []
             i, j = self.itos[s]
 
