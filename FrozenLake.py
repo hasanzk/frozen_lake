@@ -35,7 +35,7 @@ class FrozenLake(Environment):
 
         self.slip = slip
 
-        n_states = self.lake.size + 1
+        n_states = self.lake.size 
         n_actions = 4
 
         pi = np.zeros(n_states, dtype=float)

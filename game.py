@@ -8,7 +8,7 @@ from Environment import EGreedySelection
 
 def play(env):
     # Up, down, left, right, stay
-    actions = ['w', 's', 'a', 'd', ' ']
+    actions = ['w', 's', 'a', 'd']
 
     state = env.reset()
     env.render()
@@ -270,9 +270,9 @@ def main():
     
 
 
-    print('## Play')
-    play(env)
-    return
+    # print('## Play')
+    # play(env)
+    # return
     print('')
     
     print('## Policy iteration')
