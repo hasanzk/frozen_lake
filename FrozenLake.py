@@ -68,8 +68,7 @@ class FrozenLake(Environment):
                 for a_idx, a in enumerate(self.actions):
                     if a == action:
                         self._p[next_state_index, state_index, a_idx] += 0.9
-                    else:
-                        self._p[next_state_index, state_index, a_idx] += self.slip / (self.n_actions - 1)
+                    self._p[next_state_index, state_index, a_idx] += self.slip / (self.n_actions)
                     
   
     def init_possible_actions(self):
