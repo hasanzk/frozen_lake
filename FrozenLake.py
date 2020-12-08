@@ -43,12 +43,10 @@ class FrozenLake(Environment):
 
         self.absorbing_state = n_states - 1
 
-        # TODO:
-        # Up 0, down 1, left 2, right 3, stay 4
-        self.actions = [(-1, 0), (1, 0), (0, -1), (0, 1),(0,0)]
-        n_actions = len(self.actions)
+        # Up 0, down 1, left 2, right 3
+        self.actions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
         
-        Environment.__init__(self,self.lake.size,n_actions,max_steps,None)
+        Environment.__init__(self,n_states,n_actions,max_steps,None)
 
 
         # Indices to states (coordinates), states (coordinates) to indices 
@@ -117,8 +115,6 @@ class FrozenLake(Environment):
         # TODO:
         if not self.reached_goal(state) and self.reached_goal(next_state):
             return 1
-        elif self.lake[self.itos[state]] == '#' or  self.lake[self.itos[state]] == '&':
-            return -1
         else:
             return 0
 
@@ -133,7 +129,7 @@ class FrozenLake(Environment):
         else:
             # UTF-8 arrows look nicer, but cannot be used in LaTeX
             # https://www.w3schools.com/charsets/ref_utf_arrows.asp
-            actions = ['^', 'ـ', '<', '>', ' ']
+            actions = ['^', 'ـ', '<', '>']
 
             print('Lake:')
             print(self.lake)

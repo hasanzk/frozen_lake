@@ -261,7 +261,7 @@ def main():
               ['.', '#', '.', '#'],
               ['&', '#', '.', '$']]
 
-    env = FrozenLake(lake, slip=0.1, max_steps=16, seed=seed)
+    env = FrozenLake(lake, slip=0.1, max_steps=len(lake)*len(lake[0]), seed=seed)
     
     print('# Model-based algorithms')
     gamma = 0.9
@@ -270,10 +270,10 @@ def main():
     
 
 
-    # print('## Play')
-    # play(env)
-    # return
-    # print('')
+    print('## Play')
+    play(env)
+    return
+    print('')
     
     print('## Policy iteration')
     policy, value = policy_iteration(env, gamma, theta, max_iterations)
