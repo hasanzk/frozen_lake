@@ -3,7 +3,7 @@
 import numpy as np
 from FrozenLake import FrozenLake
 from Environment import EGreedySelection
-
+import time
 
 
 def play(env):
@@ -98,7 +98,7 @@ def value_iteration(env, gamma, theta, max_iterations, value=None):
 
 ################ Tabular model-free algorithms ################
 
-def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
+def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None, render=False):
     random_state = EGreedySelection(epsilon)
     
     
@@ -119,15 +119,16 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
         a = random_state(q[s], env._possible_actions[s])
         done = False
         while not done:
+            if render:
+                env.render()
             next_s, r, done = env.step(a)
-            
             next_a = random_state(q[next_s], env._possible_actions[next_s])
             q[s, a] = q[s, a] + eta[i] * (r + gamma * q[next_s, next_a] - q[s, a])
 
             s = next_s
             a = next_a
 
-    
+    run_agent(q,env,epsilon=0) # High Exploration 
     policy = q.argmax(axis=1)
     value = q.max(axis=1)
         
@@ -161,6 +162,7 @@ def q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
             s = next_s
 
 
+    run_agent(q,env,epsilon=0) # High Exploration 
     policy = q.argmax(axis=1)
     value = q.max(axis=1)
         
@@ -268,32 +270,32 @@ def main():
     # print('## Play')
     # play(env)
     # return
-    print('')
+    # print('')
     
-    print('## Policy iteration')
-    policy, value = policy_iteration(env, gamma, theta, max_iterations)
-    env.render(policy, value)
+    # print('## Policy iteration')
+    # policy, value = policy_iteration(env, gamma, theta, max_iterations)
+    # env.render(policy, value)
     
-    print('')
+    # print('')
 
-    print('## Value iteration')
-    policy, value = value_iteration(env, gamma, theta, max_iterations)
-    env.render(policy, value)
+    # print('## Value iteration')
+    # policy, value = value_iteration(env, gamma, theta, max_iterations)
+    # env.render(policy, value)
     
-    print('')
+    # print('')
     
     print('# Model-free algorithms')
     max_episodes = 2000
     eta = 0.5
     epsilon = 0.5
     
-    print('')
+    # print('')
     
-    print('## Sarsa')
-    policy, value = sarsa(env, max_episodes, eta, gamma, epsilon, seed=seed)
-    env.render(policy, value)
+    # print('## Sarsa')
+    # policy, value = sarsa(env, max_episodes, eta, gamma, epsilon, seed=seed,render=False)
+    # env.render(policy, value)
     
-    print('')
+    # print('')
     
     print('## Q-learning')
     policy, value = q_learning(env, max_episodes, eta, gamma, epsilon, seed=seed)
@@ -319,6 +321,24 @@ def main():
     policy, value = linear_env.decode_policy(parameters)
     linear_env.render(policy, value)
 
+def run_agent(q, env,epsilon):
+    for test in range(20):
+        print(f"Test #{test}")
+        s = env.reset()
+        random_state = EGreedySelection(epsilon)
+        total_reward = 0
+        done = False
+        while True:
+            time.sleep(0.5)
+            env.render()
+            a = random_state(q[s], env._possible_actions[s])
+            print(f"Chose action {a} for state {s}")
+            s, reward, done = env.step(a)
+            total_reward += reward
+            if done:
+                print(f"Episode reward: {total_reward}")
+                time.sleep(1)
+                break
 
 if __name__ == "__main__":
     main()
