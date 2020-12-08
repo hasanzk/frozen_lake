@@ -60,12 +60,12 @@ class FrozenLake(Environment):
         
         for state_index, state in enumerate(self.itos):
             for action_index, action in enumerate(self.actions):
+                next_state = (state[0] + action[0], state[1] + action[1])
+                # If next_state is not valid, default to current state index
+                next_state_index = self.stoi.get(next_state, state_index)
 
                 # However, with probability 0.1, the environment ignores the desired direction and the agent slips (moves one tile in a random direction)
                 for a_idx, a in enumerate(self.actions):
-                    next_state = (state[0] + action[0], state[1] + action[1])
-                    # If next_state is not valid, default to current state index
-                    next_state_index = self.stoi.get(next_state, state_index)
                     if a == action:
                         self._p[next_state_index, state_index, a_idx] += 0.9
                     else:
