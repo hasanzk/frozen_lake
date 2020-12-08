@@ -117,14 +117,11 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
         s = env.reset()
         # TODO:
         a = random_state(q[s], env._possible_actions[s])
-
-        while not env.reached_goal(s):
-            state = env.itos[s]
-            next_s = (state[0] + env.actions[a][0] ,state[1] + env.actions[a][1])
-            next_s = env.stoi.get(next_s,s)
-            r = env.r(next_s,s, a)
+        done = False
+        while not done:
+            next_s, r, done = env.step(a)
+            
             next_a = random_state(q[next_s], env._possible_actions[next_s])
-
             q[s, a] = q[s, a] + eta[i] * (r + gamma * q[next_s, next_a] - q[s, a])
 
             s = next_s
@@ -153,13 +150,11 @@ def q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
     for i in range(max_episodes):
         s = env.reset()
         # TODO:
-
-        while not env.reached_goal(s):
+        done = False
+        while not done:
             a = random_state(q[s], env._possible_actions[s])
-            state = env.itos[s]
-            next_s = (state[0] + env.actions[a][0] ,state[1] + env.actions[a][1])
-            next_s = env.stoi.get(next_s,s)
-            r = env.r(next_s,s, a)
+            
+            next_s, r, done = env.step(a)
 
             q[s, a] = q[s, a] + eta[i] * (r + gamma * max(q[next_s]) - q[s, a])
 
