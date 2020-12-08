@@ -94,6 +94,9 @@ class FrozenLake(Environment):
     
 
     def reached_goal(self,s):
+        # check if state is within range because of the absorbing state
+        if s >= len(self.itos):
+            return False
         return self.lake[self.itos[s]] == '$'
 
     def step(self, action):
@@ -134,7 +137,7 @@ class FrozenLake(Environment):
             print(self.lake)
 
             print('Policy:')
-            policy = np.array([actions[a] for a in policy])
+            policy = np.array([actions[a] for a in policy[:-1]])
             policy = policy.reshape(self.lake.shape)
             for i in range(len(self.lake[0])):
                 for j in range(len(self.lake[0])):
@@ -142,12 +145,10 @@ class FrozenLake(Environment):
                         print("$",end=" ")
                     elif self.lake[i][j] == '#':
                         print("#",end=" ")
-                    elif self.lake[i, j] == '&':
-                        print("&",end=" ")
                     else:
                         print(policy[i][j],end=" ")
                 print('')
 
             print('Value:')
             with _printoptions(precision=3, suppress=True):
-                print(value.reshape(self.lake.shape))
+                print(value[:-1].reshape(self.lake.shape))
