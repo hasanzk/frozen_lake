@@ -146,8 +146,6 @@ class FrozenLake(Environment):
                         print("$",end=" ")
                     elif self.lake[i][j] == '#':
                         print("#",end=" ")
-                    elif self.lake[i, j] == '&':
-                        print("&",end=" ")
                     else:
                         print(policy[i][j],end=" ")
                 print('')
