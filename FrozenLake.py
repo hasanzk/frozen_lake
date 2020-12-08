@@ -35,7 +35,7 @@ class FrozenLake(Environment):
 
         self.slip = slip
 
-        n_states = self.lake.size 
+        n_states = self.lake.size + 1
         n_actions = 4
 
         pi = np.zeros(n_states, dtype=float)
@@ -74,7 +74,7 @@ class FrozenLake(Environment):
   
     def init_possible_actions(self):
         self._possible_actions = []
-        for s in range(self.n_states):
+        for s in range(self.n_states - 1):
             s_actions = []
             i, j = self.itos[s]
 
@@ -95,6 +95,9 @@ class FrozenLake(Environment):
     
 
     def reached_goal(self,s):
+        # check if state is within range because of the absorbing state
+        if s >= len(self.itos):
+            return False
         return self.lake[self.itos[s]] == '$'
 
     def step(self, action):
@@ -135,7 +138,7 @@ class FrozenLake(Environment):
             print(self.lake)
 
             print('Policy:')
-            policy = np.array([actions[a] for a in policy])
+            policy = np.array([actions[a] for a in policy[:-1]])
             policy = policy.reshape(self.lake.shape)
             for i in range(len(self.lake[0])):
                 for j in range(len(self.lake[0])):
@@ -151,4 +154,4 @@ class FrozenLake(Environment):
 
             print('Value:')
             with _printoptions(precision=3, suppress=True):
-                print(value.reshape(self.lake.shape))
+                print(value[:-1].reshape(self.lake.shape))

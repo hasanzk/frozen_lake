@@ -108,7 +108,7 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
     q = np.zeros((env.n_states, env.n_actions))
     q.fill(float('-inf'))
     
-    for s in range(env.n_states):
+    for s in range(env.n_states - 1):
         actions = env._possible_actions[s]
         for a in actions:
             q[s, a] = 0
@@ -145,7 +145,7 @@ def q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
     q = np.zeros((env.n_states, env.n_actions))
     q.fill(float('-inf'))
     
-    for s in range(env.n_states):
+    for s in range(env.n_states - 1):
         actions = env._possible_actions[s]
         for a in actions:
             q[s, a] = 0
@@ -256,10 +256,10 @@ def main():
     seed = 0
     
     # Small lake
-    lake =   [['.', '.', '.', '.'],
-              ['.', '#', '.', '#'],
-              ['.', '#', '.', '#'],
-              ['&', '#', '.', '$']]
+    lake = [['&', '.', '.', '.'],
+            ['.', '#', '.', '#'],
+            ['.', '.', '.', '#'],
+            ['#', '.', '.', '$']]
 
     env = FrozenLake(lake, slip=0.1, max_steps=len(lake)*len(lake[0]), seed=seed)
     
