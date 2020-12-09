@@ -22,8 +22,7 @@ def play(env):
             raise Exception('Invalid action')
 
         state, r, done = env.step(actions.index(c))
-        if not done:
-            env.render()
+        env.render()
         print('Reward: {0}.'.format(r))
 
 ################ Model-based algorithms ################
@@ -267,10 +266,10 @@ def main():
     
 
 
-    # print('## Play')
-    # play(env)
-    # return
-    # print('')
+    print('## Play')
+    play(env)
+    return
+    print('')
     
     # print('## Policy iteration')
     # policy, value = policy_iteration(env, gamma, theta, max_iterations)

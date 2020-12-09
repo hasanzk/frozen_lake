@@ -60,15 +60,22 @@ class FrozenLake(Environment):
         
         for state_index, state in enumerate(self.itos):
             for action_index, action in enumerate(self.actions):
-                next_state = (state[0] + action[0], state[1] + action[1])
-                # If next_state is not valid, default to current state index
-                next_state_index = self.stoi.get(next_state, state_index)
+                if self.lake[state] == '$' or self.lake[state] == '#':
+                    next_state_index = self.absorbing_state
+                else:
+                    next_state = (state[0] + action[0], state[1] + action[1])
+                    # If next_state is not valid, default to current state index
+                    next_state_index = self.stoi.get(next_state, state_index)
 
                 # However, with probability 0.1, the environment ignores the desired direction and the agent slips (moves one tile in a random direction)
                 for a_idx, a in enumerate(self.actions):
                     if a == action:
                         self._p[next_state_index, state_index, a_idx] += 0.9
                     self._p[next_state_index, state_index, a_idx] += self.slip / (self.n_actions)
+
+        # Transition probabilities for the absorbing state
+        for a_idx, a in enumerate(self.actions):
+            self._p[self.absorbing_state, self.absorbing_state, a_idx] += 1
                     
   
     def init_possible_actions(self):
@@ -100,10 +107,7 @@ class FrozenLake(Environment):
         return self.lake[self.itos[s]] == '$'
 
     def step(self, action):
-        gameover = (self.lake[self.itos[self.state]] == '$') or (self.lake[self.itos[self.state]] == '#')
         state, reward, done = Environment.step(self, action)
-
-        done = (state == self.absorbing_state) or done or gameover
 
         return state, reward, done
 
@@ -114,8 +118,7 @@ class FrozenLake(Environment):
 
     # returns the expected reward in having transitioned from state to next state given action
     def r(self, next_state, state, action):
-        # TODO:
-        if not self.reached_goal(state) and self.reached_goal(next_state):
+        if self.reached_goal(state):
             return 1
         else:
             return 0
@@ -126,6 +129,9 @@ class FrozenLake(Environment):
 
             if self.state < self.absorbing_state:
                 lake[self.state] = '@'
+                self.last_state_rendered = lake
+            else:
+                lake = self.last_state_rendered
 
             print(lake.reshape(self.lake.shape))
         else:
