@@ -87,22 +87,24 @@ def value_iteration(env, gamma, theta, max_iterations, value=None):
     return policy, value
 
 ################ Tabular model-free algorithms ################
+def argmax_random(A):
+    arg = np.argsort(A)[::-1]
+    n_tied = sum(np.isclose(A, A[arg[0]]))
+    return np.random.choice(arg[0:n_tied])
 
 # Selecting an action for state s according to e-greedy policy based on q
-def EGreedySelection(env, random_state, q, s, epsilon):
+def EGreedySelection(env, q, s, epsilon):
     if s < env.lake.size:
         actions = env._possible_actions[s]
     else:
         actions = range(env.n_actions)
 
-    if random_state.rand() < epsilon:
-        return random_state.choice(actions)
+    if np.random.uniform(0, 1) < epsilon:
+        return np.random.choice(actions)
     else:
-        return actions[np.argmax(q[actions])]
+        return actions[argmax_random(q[actions])]
 
 def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
-    random_state = np.random.RandomState(seed)
-
     eta = np.linspace(eta, 0, max_episodes)
     epsilon = np.linspace(epsilon, 0, max_episodes)
     
@@ -110,16 +112,16 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
 
     for i in range(max_episodes):
         s = env.reset()
+        a = EGreedySelection(env, q[s], s, epsilon[i])
 
-        a = EGreedySelection(env, random_state, q[s], s, epsilon[i])
         done = False
         while not done:
             next_s, r, done = env.step(a)
-            next_a = EGreedySelection(env, random_state, q[next_s], next_s, epsilon[i])
-            q[s, a] = q[s, a] + eta[i] * (r + gamma * q[next_s, next_a] - q[s, a])
+            next_a = EGreedySelection(env, q[next_s], next_s, epsilon[i])
+            q[s, a] += eta[i] * (r + gamma * q[next_s, next_a] - q[s, a])
             s = next_s
             a = next_a
-        print('%d/%d' % (i, max_episodes))
+        
     policy = q.argmax(axis=1)
     value = q.max(axis=1)
         
@@ -289,7 +291,7 @@ def main():
     print('')
     
     print('# Model-free algorithms')
-    max_episodes = 50000
+    max_episodes = 20000
     eta = 0.5
     epsilon = 0.5
     
