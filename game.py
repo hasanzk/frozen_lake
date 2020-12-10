@@ -136,7 +136,7 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None, render=False):
         
     return policy, value
     
-def q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
+def q_learning(env, max_episodes, eta, gamma, epsilon, seed=None, render=False):
     random_state = EGreedySelection(epsilon)
     
     eta = np.linspace(eta, 0, max_episodes)
@@ -158,13 +158,17 @@ def q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
             a = random_state(q[s], env._possible_actions[s])
             
             next_s, r, done = env.step(a)
-
-            q[s, a] = q[s, a] + eta[i] * (r + gamma * max(q[next_s]) - q[s, a])
+            
+            # when reaching absorbing state use same action
+            if done:
+                q[s,a] = q[s,a] + eta[i] * (r - q[s,a ])
+            else:
+                q[s, a] = q[s, a] + eta[i] * (r + gamma * max(q[next_s]) - q[s, a])
 
             s = next_s
 
-
-    run_agent(q,env,epsilon=0) # High Exploration 
+    if render:
+        run_agent(q,env,epsilon=0) # High Exploration 
     policy = q.argmax(axis=1)
     value = q.max(axis=1)
         
@@ -293,15 +297,15 @@ def main():
     
     # print('')
     
-    print('## Sarsa')
-    policy, value = sarsa(env, max_episodes, eta, gamma, epsilon, seed=seed,render=False)
-    env.render(policy, value)
+    # print('## Sarsa')
+    # policy, value = sarsa(env, max_episodes, eta, gamma, epsilon, seed=seed,render=False)
+    # env.render(policy, value)
     
     # print('')
     
-    # print('## Q-learning')
-    # policy, value = q_learning(env, max_episodes, eta, gamma, epsilon, seed=seed)
-    # env.render(policy, value)
+    print('## Q-learning')
+    policy, value = q_learning(env, max_episodes, eta, gamma, epsilon, seed=seed)
+    env.render(policy, value)
     
     print('')
     return
