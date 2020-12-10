@@ -26,6 +26,8 @@ def play(env):
         print('Reward: {0}.'.format(r))
 
 ################ Model-based algorithms ################
+def action_value(env, value, state, action, gamma):
+    return sum([env.p(next_s, state, action) * (env.r(next_s, state, action) + gamma * value[next_s]) for next_s in range(env.n_states)])
 
 def policy_evaluation(env, policy, gamma, theta, max_iterations):
     value = np.zeros(env.n_states, dtype=np.float)
@@ -34,7 +36,7 @@ def policy_evaluation(env, policy, gamma, theta, max_iterations):
         delta = 0
         for s in range(env.n_states):
             v = value[s]
-            value[s] = sum([env.p(next_s, s, policy[s]) * (env.r(next_s, s, policy[s]) + gamma * value[next_s]) for next_s in range(env.n_states)])
+            value[s] = action_value(env, value, s, policy[s], gamma)
 
             delta = max(delta, abs(v - value[s]))
 
@@ -43,16 +45,11 @@ def policy_evaluation(env, policy, gamma, theta, max_iterations):
 
     return value
 
-    
 def policy_improvement(env, value, gamma):
     policy = np.zeros(env.n_states, dtype=int)
-    # TODO:
 
     for s in range(env.n_states):
-        actions = [0,1,2,3]
-
-        b = policy[s]
-        policy[s] = actions[np.argmax([sum([env.p(next_s, s, a) * (env.r(next_s, s, a) + gamma * value[next_s]) for next_s in range(env.n_states)]) for a in actions])]
+        policy[s] = np.argmax([action_value(env, value, s, a, gamma) for a in range(env.n_actions)])
 
     return policy
     
@@ -61,9 +58,6 @@ def policy_iteration(env, gamma, theta, max_iterations, policy=None):
         policy = np.zeros(env.n_states, dtype=int)
     else:
         policy = np.array(policy, dtype=int)
-    
-
-    # TODO:
 
     for i in range(max_iterations):
         values = policy_evaluation(env, policy, gamma, theta,max_iterations)
@@ -78,20 +72,18 @@ def value_iteration(env, gamma, theta, max_iterations, value=None):
         value = np.array(value, dtype=np.float)
     
     for _ in range(max_iterations):
-        delta = 0.
+        delta = 0
         
         for s in range(env.n_states):
             v = value[s]
-            value[s] = max([sum([env.p(next_s, s, a) * (env.r(next_s, s, a) + gamma * value[next_s]) for next_s in range(env.n_states)]) for a in range(env.n_actions)])
+            value[s] = max([action_value(env, value, s, a, gamma) for a in range(env.n_actions)])
     
             delta = max(delta, np.abs(v - value[s]))
 
         if delta < theta:
             break
 
-    policy = np.zeros(env.n_states, dtype=int)
-    for s in range(env.n_states):
-        policy[s] = np.argmax([sum([env.p(next_s, s, a) * (env.r(next_s, s, a) + gamma * value[next_s]) for next_s in range(env.n_states)]) for a in range(env.n_actions)])
+    policy = policy_improvement(env, value, gamma)
 
     return policy, value
 
@@ -263,38 +255,39 @@ def main():
     gamma = 0.9
     theta = 0.001
     max_iterations = 100
-    
 
+    # print('')
 
-    print('## Play')
-    play(env)
-    return
+    # print('## Play')
+    # play(env)
+    # return
+
     print('')
     
-    # print('## Policy iteration')
-    # policy, value = policy_iteration(env, gamma, theta, max_iterations)
-    # env.render(policy, value)
+    print('## Policy iteration')
+    policy, value = policy_iteration(env, gamma, theta, max_iterations)
+    env.render(policy, value)
     
-    # print('')
+    print('')
 
-    # print('## Value iteration')
-    # policy, value = value_iteration(env, gamma, theta, max_iterations)
-    # env.render(policy, value)
+    print('## Value iteration')
+    policy, value = value_iteration(env, gamma, theta, max_iterations)
+    env.render(policy, value)
     
-    # print('')
+    print('')
     
     print('# Model-free algorithms')
     max_episodes = 2000
     eta = 0.5
     epsilon = 0.5
     
-    # print('')
+    print('')
     
-    # print('## Sarsa')
-    # policy, value = sarsa(env, max_episodes, eta, gamma, epsilon, seed=seed,render=False)
-    # env.render(policy, value)
+    print('## Sarsa')
+    policy, value = sarsa(env, max_episodes, eta, gamma, epsilon, seed=seed,render=False)
+    env.render(policy, value)
     
-    # print('')
+    print('')
     
     print('## Q-learning')
     policy, value = q_learning(env, max_episodes, eta, gamma, epsilon, seed=seed)

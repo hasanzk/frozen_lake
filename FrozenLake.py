@@ -1,4 +1,3 @@
-
 import numpy as np
 import contextlib
 from Environment import Environment
@@ -14,7 +13,6 @@ def _printoptions(*args, **kwargs):
         yield
     finally:
         np.set_printoptions(**original)
-
 
 
 class FrozenLake(Environment):
@@ -76,11 +74,10 @@ class FrozenLake(Environment):
         # Transition probabilities for the absorbing state
         for a_idx, a in enumerate(self.actions):
             self._p[self.absorbing_state, self.absorbing_state, a_idx] += 1
-                    
-  
+
     def init_possible_actions(self):
         self._possible_actions = []
-        for s in range(self.n_states - 1):
+        for s in range(self.lake.size):
             s_actions = []
             i, j = self.itos[s]
 
@@ -98,7 +95,6 @@ class FrozenLake(Environment):
     def valid_coord(self, i, j):
         valid = i >= 0 and i < self.lake[0].size and j >= 0 and j < self.lake[0].size
         return valid
-    
 
     def reached_goal(self,s):
         # check if state is within range because of the absorbing state
@@ -109,12 +105,14 @@ class FrozenLake(Environment):
     def step(self, action):
         state, reward, done = Environment.step(self, action)
 
+        done = (state == self.absorbing_state) or done
+
         return state, reward, done
 
     # returns the probability of transitioning from state to next state given action
     def p(self, next_state, state, action):
-        # TODO:
-        return self._p[next_state, state, action] 
+
+        return self._p[next_state, state, action]
 
     # returns the expected reward in having transitioned from state to next state given action
     def r(self, next_state, state, action):
