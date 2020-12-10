@@ -108,7 +108,7 @@ class FrozenLake(Environment):
 
     def step(self, action):
         state, reward, done = Environment.step(self, action)
-
+        done = (state == self.absorbing_state) or done
         return state, reward, done
 
     # returns the probability of transitioning from state to next state given action

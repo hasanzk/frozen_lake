@@ -121,13 +121,16 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None, render=False):
             if render:
                 env.render()
             next_s, r, done = env.step(a)
-            next_a = random_state(q[next_s], env._possible_actions[next_s])
-            q[s, a] = q[s, a] + eta[i] * (r + gamma * q[next_s, next_a] - q[s, a])
-
+            # when reaching absorbing state use same action
+            if done:
+                q[s,a] = q[s,a] + eta[i] * (r - q[s,a ])
+            else:
+                next_a = random_state(q[next_s], env._possible_actions[next_s])
+                q[s, a] = q[s, a] + eta[i] * (r + gamma * q[next_s, next_a] - q[s, a])
             s = next_s
             a = next_a
-
-    run_agent(q,env,epsilon=0) # High Exploration 
+    if render:
+        run_agent(q,env,epsilon=0) # High Exploration 
     policy = q.argmax(axis=1)
     value = q.max(axis=1)
         
@@ -266,10 +269,10 @@ def main():
     
 
 
-    print('## Play')
-    play(env)
-    return
-    print('')
+    # print('## Play')
+    # play(env)
+    # return
+    # print('')
     
     # print('## Policy iteration')
     # policy, value = policy_iteration(env, gamma, theta, max_iterations)
@@ -290,15 +293,15 @@ def main():
     
     # print('')
     
-    # print('## Sarsa')
-    # policy, value = sarsa(env, max_episodes, eta, gamma, epsilon, seed=seed,render=False)
-    # env.render(policy, value)
+    print('## Sarsa')
+    policy, value = sarsa(env, max_episodes, eta, gamma, epsilon, seed=seed,render=False)
+    env.render(policy, value)
     
     # print('')
     
-    print('## Q-learning')
-    policy, value = q_learning(env, max_episodes, eta, gamma, epsilon, seed=seed)
-    env.render(policy, value)
+    # print('## Q-learning')
+    # policy, value = q_learning(env, max_episodes, eta, gamma, epsilon, seed=seed)
+    # env.render(policy, value)
     
     print('')
     return
