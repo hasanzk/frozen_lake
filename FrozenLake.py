@@ -81,14 +81,14 @@ class FrozenLake(Environment):
             s_actions = []
             i, j = self.itos[s]
 
-            if self.valid_coord(i + 1, j):
-                s_actions.append(1)
             if self.valid_coord(i - 1, j):
                 s_actions.append(0)
-            if self.valid_coord(i, j + 1):
-                s_actions.append(3)
+            if self.valid_coord(i + 1, j):
+                s_actions.append(1)
             if self.valid_coord(i, j - 1):
                 s_actions.append(2)
+            if self.valid_coord(i, j + 1):
+                s_actions.append(3)
 
             self._possible_actions.append(s_actions)
 
