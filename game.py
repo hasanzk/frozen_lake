@@ -193,26 +193,37 @@ class LinearWrapper:
     
     def render(self, policy=None, value=None):
         self.env.render(policy, value)
-        
+
+def LineareGreedySelection(env, random_state, q, epsilon):
+    actions = range(env.n_actions)
+
+    if random_state.rand() < epsilon:
+        return random_state.choice(actions)
+    else:
+        return actions[argmax_random(q[actions])]
+
 def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
-    random_state = EGreedySelection(epsilon)
+    random_state = np.random.RandomState(seed)
     
     eta = np.linspace(eta, 0, max_episodes)
     epsilon = np.linspace(epsilon, 0, max_episodes)
     
     theta = np.zeros(env.n_features)
-    for s in range(env.n_states):
-        actions = env._possible_actions[s]
-        for a in actions:
-            q[s, a] = 0
-
 
     for i in range(max_episodes):
         features = env.reset()
-        
         q = features.dot(theta)
+        a = LineareGreedySelection(env, random_state, q, epsilon[i])
 
-        # TODO:
+        done = False
+        while not done:
+            next_features, r, done = env.step(a)
+            delta = r - q[a]
+            q = next_features.dot(theta)
+            next_a = LineareGreedySelection(env, random_state, q, epsilon[i])
+            delta += gamma * q[next_a]
+            theta += eta[i] * delta * features[a,:]
+            features = next_features
     
     return theta
     
@@ -226,8 +237,17 @@ def linear_q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
     
     for i in range(max_episodes):
         features = env.reset()
-        
-        # TODO:
+        q = features.dot(theta)
+
+        done = False
+        while not done:
+            a = LineareGreedySelection(env, random_state, q, epsilon[i])
+            next_features, r, done = env.step(a)
+            delta = r - q[a]
+            q = next_features.dot(theta)
+            delta += gamma * max(q)
+            theta += eta[i] * delta * features[a, :]
+            features = next_features
 
     return theta    
 
@@ -295,7 +315,7 @@ def main():
     env.render(policy, value)
     
     print('')
-    return
+
     linear_env = LinearWrapper(env)
     
     print('## Linear Sarsa')
