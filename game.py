@@ -25,9 +25,12 @@ def play(env):
         print('Reward: {0}.'.format(r))
 
 ################ Model-based algorithms ################
+# Computes the common part of the equations used in the Model-based algorithms
 def action_value(env, value, state, action, gamma):
     return sum([env.p(next_s, state, action) * (env.r(next_s, state, action) + gamma * value[next_s]) for next_s in range(env.n_states)])
 
+# receives an environment model, a deterministic policy, a discount factor, a tolerance parameter, and a maximum number of iterations
+# returns the value matrix of a policy
 def policy_evaluation(env, policy, gamma, theta, max_iterations):
     value = np.zeros(env.n_states, dtype=np.float)
 
@@ -44,6 +47,8 @@ def policy_evaluation(env, policy, gamma, theta, max_iterations):
 
     return value
 
+# receives an environment model, the value function for a policy to be improved, and a discount factor.
+# returns the new improved policy
 def policy_improvement(env, value, gamma):
     policy = np.zeros(env.n_states, dtype=int)
 
@@ -51,7 +56,10 @@ def policy_improvement(env, value, gamma):
         policy[s] = np.argmax([action_value(env, value, s, a, gamma) for a in range(env.n_actions)])
 
     return policy
-    
+
+# receives an environment model, a discount factor, a tolerance parameter,..
+# a maximum number of iterations, and (optionally) the initial policy
+# returns policy and value matrix
 def policy_iteration(env, gamma, theta, max_iterations, policy=None):
     if policy is None:
         policy = np.zeros(env.n_states, dtype=int)
@@ -63,7 +71,10 @@ def policy_iteration(env, gamma, theta, max_iterations, policy=None):
         policy = policy_improvement(env, values, gamma)
 
     return policy, values
-    
+
+# receives an environment model, a discount factor, a tolerance parameter,..
+# a maximum number of iterations, and (optionally) the initial value function.
+# returns policy and value matrix
 def value_iteration(env, gamma, theta, max_iterations, value=None):
     if value is None:
         value = np.zeros(env.n_states)
@@ -87,12 +98,16 @@ def value_iteration(env, gamma, theta, max_iterations, value=None):
     return policy, value
 
 ################ Tabular model-free algorithms ################
+# receives an array of values
+# returns the index of the maximum one, or a randomly selected one from multiple maximum values
 def argmax_random(A):
     arg = np.argsort(A)[::-1]
     n_tied = sum(np.isclose(A, A[arg[0]]))
     return np.random.choice(arg[0:n_tied])
 
 # Selecting an action for state s according to e-greedy policy based on q
+# receives an environment, a pseudo-random number generator, action values, a state and an initial exploration factor
+# returns an action index
 def EGreedySelection(env, random_state, q, s, epsilon):
     if s < env.lake.size:
         actions = env._possible_actions[s]
@@ -104,6 +119,10 @@ def EGreedySelection(env, random_state, q, s, epsilon):
     else:
         return actions[argmax_random(q[actions])]
 
+# receives an environment, a maximum number of episodes, an initial learning rate,..
+# a discount factor, an initial exploration factor, and an (optional) seed that controls..
+# the pseudorandom number generator.
+# returns policy and value matrix
 def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
     random_state = np.random.RandomState(seed)
 
@@ -128,7 +147,11 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
     value = q.max(axis=1)
         
     return policy, value
-    
+
+# receives an environment, a maximum number of episodes, an initial learning rate,
+# a discount factor, an initial exploration factor, and an (optional) seed that controls
+# the pseudorandom number generator
+# returns policy and value matrix
 def q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
     random_state = np.random.RandomState(seed)
     
@@ -155,6 +178,7 @@ def q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
 
 ################ Non-tabular model-free algorithms ################
 
+# a wrapper that behaves similarly to a given environment
 class LinearWrapper:
     def __init__(self, env):
         self.env = env
@@ -195,6 +219,9 @@ class LinearWrapper:
     def render(self, policy=None, value=None):
         self.env.render(policy, value)
 
+# Selecting an action for state s according to e-greedy policy based on q
+# receives an environment, a pseudo-random number generator, action values and an initial exploration factor
+# returns an action index
 def LineareGreedySelection(env, random_state, q, epsilon):
     actions = range(env.n_actions)
 
@@ -203,6 +230,10 @@ def LineareGreedySelection(env, random_state, q, epsilon):
     else:
         return actions[argmax_random(q[actions])]
 
+# receives an environment (wrapped by LinearWrapper), a maximum number of episodes,
+# an initial learning rate, a discount factor, an initial exploration factor, and
+# an (optional) seed that controls the pseudorandom number generator.
+# returns a parameter vector that estimates the policy
 def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
     random_state = np.random.RandomState(seed)
     
@@ -228,7 +259,11 @@ def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
             a = next_a
 
     return theta
-    
+
+# receives an environment (wrapped by LinearWrapper), a maximum number of episodes,
+# an initial learning rate, a discount factor, an initial exploration factor, and
+# an (optional) seed that controls the pseudorandom number generator.
+# returns a parameter vector that estimates the policy
 def linear_q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
     random_state = np.random.RandomState(seed)
     
@@ -281,7 +316,6 @@ def main():
     theta = 0.001
     max_iterations = 15
 
-
     # print('## Play')
     # play(env)
     # return
@@ -300,7 +334,7 @@ def main():
     print('')
     
     print('# Model-free algorithms')
-    max_episodes = 30000
+    max_episodes = 20000
     eta = 0.5
     epsilon = 0.5
     
