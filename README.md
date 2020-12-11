@@ -1,10 +1,10 @@
-# FozenLake
+# FrozenLake
 
 Finding policies for the frozen lake environment using reinforcement learning algorithms
 
 ## Getting Started
 
-These instructions will get you a copy of the FozenLake up and running on your local machine for development and testing purposes
+These instructions will get you a copy of the FrozenLake up and running on your local machine for development and testing purposes
 
 ### Prerequisites
 
