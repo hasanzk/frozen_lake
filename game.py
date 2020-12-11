@@ -144,7 +144,8 @@ def q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
         while not done:
             a = EGreedySelection(env, random_state, q[s], s, epsilon[i])
             next_s, r, done = env.step(a)
-            q[s, a] += eta[i] * (r + gamma * max(q[next_s]) - q[s, a])
+            if done: q[s, a] += eta[i] * (r - q[s, a])
+            else: q[s, a] += eta[i] * (r + gamma * max(q[next_s]) - q[s, a])
             s = next_s
 
     policy = q.argmax(axis=1)
@@ -272,7 +273,7 @@ def main():
             ['.', '#', '#', '.', '.', '.', '#', '.'], 
             ['.', '#', '.', '.', '#', '.', '#', '.'],   
             ['.', '.', '.', '#', '.', '.', '.', '$']]
-    lake = smallLake
+    lake = largeLake
     env = FrozenLake(lake, slip=0.1, max_steps=np.array(lake).size, seed=seed)
     
     print('# Model-based algorithms')
@@ -299,7 +300,7 @@ def main():
     print('')
     
     print('# Model-free algorithms')
-    max_episodes = 500
+    max_episodes = 30000
     eta = 0.5
     epsilon = 0.5
     
