@@ -224,7 +224,8 @@ def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
             delta += gamma * q[next_a]
             theta += eta[i] * delta * features[a,:]
             features = next_features
-    
+            a = next_a
+
     return theta
     
 def linear_q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
@@ -271,7 +272,7 @@ def main():
             ['.', '#', '#', '.', '.', '.', '#', '.'], 
             ['.', '#', '.', '.', '#', '.', '#', '.'],   
             ['.', '.', '.', '#', '.', '.', '.', '$']]
-    lake = largeLake
+    lake = smallLake
     env = FrozenLake(lake, slip=0.1, max_steps=np.array(lake).size, seed=seed)
     
     print('# Model-based algorithms')
@@ -298,7 +299,7 @@ def main():
     print('')
     
     print('# Model-free algorithms')
-    max_episodes = 20000
+    max_episodes = 500
     eta = 0.5
     epsilon = 0.5
     
