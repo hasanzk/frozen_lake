@@ -14,12 +14,15 @@ class Environment(EnvironmentModel):
         if self.pi is None:
             self.pi = np.full(n_states, 1./n_states)
 
+    # resets the state of the environment and the number of steps taken
     def reset(self):
         self.n_steps = 0
         self.state = 0 
 
         return self.state
 
+    # receives an action and returns a state drawn according to p together with the corresponding..
+    # expected reward and whether the max steps has been exceeded or not
     def step(self, action):
         if action < 0 or action >= self.n_actions:
             raise Exception('Invalid action.')
@@ -31,5 +34,6 @@ class Environment(EnvironmentModel):
 
         return self.state, reward, done
 
+    # renders the environment
     def render(self, policy=None, value=None):
         raise NotImplementedError()
